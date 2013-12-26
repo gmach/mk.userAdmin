@@ -1,0 +1,62 @@
+<html>
+<head>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+</head>
+<body>
+<form id="createform">
+Name  :  <input type="text" name="name"/>
+Age  :  <input type="text" name="age"/>
+<input type="submit" value="Create"/>
+</form>
+
+<form id="readform">
+Id  :  <input type="text" name="id"/>
+<input type="submit" value="Read"/>
+</form>
+
+<form id="updateform">
+Id  :  <input type="text" name="id"/>
+Name  :  <input type="text" name="name"/>
+Age  :  <input type="text" name="age"/>
+<input type="submit" value="Update"/>
+</form>
+
+<form id="deleteform" >
+Id  :  <input type="text" name="id"/>
+<input type="submit" value="Delete"/>
+</form>
+
+<div id="results"></div>
+
+<script>
+$(function() {
+	function rest(event) {
+		var postData = $(this).serializeArray();
+		var formURL = "http://localhost:8080/api/customer";
+		var type = event.data.type;
+		if (type == 'DELETE') {
+			formURL += '?id=' + postData[0].value;
+		}
+		$.ajax({
+			  type: type,
+			  url: formURL,
+			  data: postData,
+			  success: function(data) {
+				  $("#results").html(JSON.stringify(data));
+			  } ,
+			  error: function(jqXHR, textStatus, errorThrown) 
+		      {
+		          console.log("ERROR!");  
+		      }
+		});
+		event.preventDefault();
+	}
+	
+	$("#createform").submit({"type": "POST"}, rest);
+	$("#readform").submit({"type": "GET"}, rest);
+	$("#updateform").submit({"type": "PUT"}, rest);
+	$("#deleteform").submit({"type": "DELETE"}, rest);
+}());
+</script>
+</body>
+</html>
