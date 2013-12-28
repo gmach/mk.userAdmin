@@ -1,50 +1,61 @@
 package com.mk.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mk.domain.Customer;
-import com.mk.service.CustomerService;
+import com.mk.persistence.CustomerDAO;
 
-@Controller
+@RestController
 @RequestMapping("api")
 public class CustomerController {
-	CustomerService customerService;
+	CustomerDAO customerService;
 	
 	@Autowired
-	public CustomerController(CustomerService customerService) {
+	public CustomerController(CustomerDAO customerService) {
 		this.customerService = customerService;
 	}
 
-	@RequestMapping(value="customer", method=RequestMethod.POST)
-	@ResponseBody
-	public String createCustomer(Customer customer) {
+	@RequestMapping(value="customer", method = RequestMethod.POST)
+	public String createCustomer(@RequestBody Customer customer) {
 		customerService.create(customer);
 		return "Created Customer: " + toJSONString(customer);
 	}
 	
 	@RequestMapping(value="customer", method=RequestMethod.GET, params="id")
-	@ResponseBody
 	public Customer readCustomer(@RequestParam("id") int id) {
 		return customerService.read(id);
 	}
 	
-	@RequestMapping(value="customer", method=RequestMethod.PUT)
-	@ResponseBody
-	public String updateCustomer(Customer customer) {
+	@RequestMapping(value="customer/{id}", method = RequestMethod.GET)  
+	public Customer readCustomerPath(@PathVariable int id) {
+		return customerService.read(id);
+	}
+	
+	@RequestMapping(value="customer", method = RequestMethod.GET)  
+	public List readCustomerList() {
+		return customerService.readAll();
+	}
+	
+	@RequestMapping(value="customer/{id}", method = RequestMethod.PUT)
+	public String updateCustomer(@RequestBody Customer customer, @PathVariable int id) {
 		customerService.update(customer);
 		return "Updated Customer: " + toJSONString(customer);
 	}
 	
-	@RequestMapping(value="customer", method=RequestMethod.DELETE, params="id")
-	@ResponseBody
-	public String deleteCustomer(@RequestParam("id") int id) {
+	@RequestMapping(value="customer/{id}", method = RequestMethod.DELETE)
+	public String deleteCustomer(@PathVariable int id) {
 		customerService.delete(id);
 		return "Deleted Customer: for id : " + id;
 	}
